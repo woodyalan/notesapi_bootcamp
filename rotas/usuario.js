@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { Usuario } = require("../bd");
 const router = Router();
 
 router.get("/", (req, res) => {
