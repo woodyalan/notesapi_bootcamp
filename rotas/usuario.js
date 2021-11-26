@@ -2,8 +2,31 @@ const { Router } = require("express");
 const { Usuario } = require("../bd");
 const router = Router();
 
-router.get("/:id?", (req, res) => {
-  res.send([]);
+router.get("/:id?", async (req, res) => {
+  let resultado;
+
+  if (req.params.id) {
+    console.log("Buscando usando findAll + where");
+    // [resultado] = await Usuario.findAll({
+    //   where: {
+    //     id: req.params.id,
+    //   },
+    // });
+
+    console.log("Buscando usando findByPk");
+    resultado = await Usuario.findByPk(req.params.id);
+
+    console.log("Buscando usando findOne");
+    // resultado = await Usuario.findOne({
+    //   where: {
+    //     id: req.params.id,
+    //   },
+    // });
+  } else {
+    resultado = await Usuario.findAll();
+  }
+
+  res.send(resultado);
 });
 
 router.post("/", async (req, res) => {
@@ -29,7 +52,7 @@ router.put("/:id", async (req, res) => {
   const { nome, email, senha } = req.body;
   const { id } = req.params;
 
-  const usuario = await Usuario.update(
+  await Usuario.update(
     {
       nome,
       email,
@@ -41,6 +64,8 @@ router.put("/:id", async (req, res) => {
       },
     }
   );
+
+  const usuario = await Usuario.findByPk(id);
 
   res.send(usuario);
 });
