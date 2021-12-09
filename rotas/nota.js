@@ -4,6 +4,7 @@ const { getNota, getNotas } = require("../controle/nota");
 const router = Router();
 
 router.get("/:id?", async (req, res) => {
+  console.log(req.usuarioId);
   const { id } = req.params;
 
   let resultado = id ? await getNota(id) : await getNotas();

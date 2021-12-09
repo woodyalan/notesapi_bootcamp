@@ -8,7 +8,11 @@ app.use(express.json());
 
 const usuario = require("./rotas/usuario");
 const nota = require("./rotas/nota");
+const login = require("./rotas/login");
+const autorizacao = require("./middleware/autorizacao");
 
+app.use("/login", login);
+app.use(autorizacao);
 app.use("/usuario", usuario);
 app.use("/nota", nota);
 

@@ -1,3 +1,6 @@
+const bcrypt = require("bcrypt");
+const { saltos } = require("../config/token");
+
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define(
     "Usuario",
@@ -24,6 +27,13 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: "usuario",
       timestamps: false,
+      hooks: {
+        beforeValidate: (usuario) => {
+          if (usuario.senha) {
+            usuario.senha = bcrypt.hashSync(usuario.senha, saltos);
+          }
+        },
+      },
     }
   );
 
