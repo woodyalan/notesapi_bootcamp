@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { login } = require("../controle/usuario");
+const { Usuario } = require("../bd");
 const router = Router();
 
 router.post("/", async (req, res) => {
@@ -31,6 +32,8 @@ router.post("/registrar", async (req, res) => {
       email,
     },
   });
+
+  delete usuario.senha;
 
   res.send(usuario);
 });

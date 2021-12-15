@@ -34,6 +34,16 @@ module.exports = (sequelize, DataTypes) => {
           }
         },
       },
+      defaultScope: {
+        attributes: {
+          exclude: ["senha"],
+        },
+      },
+      scopes: {
+        login: {
+          attributes: ["id", "senha"],
+        },
+      },
     }
   );
 

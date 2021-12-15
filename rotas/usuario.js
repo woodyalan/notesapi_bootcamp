@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
     },
   });
 
-  console.log(novoRegistro);
+  delete usuario.senha;
 
   res.send(usuario);
 });

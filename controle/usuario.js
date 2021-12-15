@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { Usuario } = require("../bd");
 const { palavraChave } = require("../config/token");
 let controller = {};
@@ -6,8 +7,9 @@ let controller = {};
 controller.login = async (email, senha) => {
   try {
     const usuario = await controller.getUsuarioByEmail(email);
+    const senhaIgual = await bcrypt.compare(senha, usuario.senha);
 
-    if (usuario.senha != senha) {
+    if (!senhaIgual) {
       return false;
     }
 
@@ -18,7 +20,7 @@ controller.login = async (email, senha) => {
 };
 
 controller.getUsuarioByEmail = async (email) => {
-  return await Usuario.findOne({
+  return await Usuario.scope("login").findOne({
     where: {
       email,
     },
