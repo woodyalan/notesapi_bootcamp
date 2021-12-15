@@ -4,16 +4,17 @@ const { getNota, getNotas } = require("../controle/nota");
 const router = Router();
 
 router.get("/:id?", async (req, res) => {
-  console.log(req.usuarioId);
+  const usuarioId = req.usuarioId;
   const { id } = req.params;
 
-  let resultado = id ? await getNota(id) : await getNotas();
+  let resultado = id ? await getNota(id, usuarioId) : await getNotas(usuarioId);
 
   res.send(resultado);
 });
 
 router.post("/", async (req, res) => {
-  const { usuarioId, titulo, descricao, checklists } = req.body;
+  const usuarioId = req.usuarioId;
+  const { titulo, descricao, checklists } = req.body;
   const transacao = await sequelize.transaction();
 
   try {
@@ -64,7 +65,8 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const transacao = await sequelize.transaction();
   const { id } = req.params;
-  const { usuarioId, titulo, descricao, checklists } = req.body;
+  const usuarioId = req.usuarioId;
+  const { titulo, descricao, checklists } = req.body;
 
   try {
     await Nota.update(
@@ -76,6 +78,7 @@ router.put("/:id", async (req, res) => {
       {
         where: {
           id,
+          usuarioId,
         },
         transaction: transacao,
       }
@@ -126,6 +129,7 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  const usuarioId = req.usuarioId;
   const transacao = await sequelize.transaction();
   const { id } = req.params;
 
@@ -137,16 +141,25 @@ router.delete("/:id", async (req, res) => {
       transaction: transacao,
     });
 
-    await Nota.destroy({
+    const removidas = await Nota.destroy({
       where: {
         id,
+        usuarioId,
       },
       transaction: transacao,
     });
 
-    await transacao.commit();
+    if (removidas == 0) {
+      await transacao.rollback();
 
-    res.send(200);
+      res
+        .status(404)
+        .send({ mensagem: "Nota não encontrada para o seu usuario" });
+    } else {
+      await transacao.commit();
+
+      res.send(200);
+    }
   } catch (erro) {
     await transacao.rollback();
 

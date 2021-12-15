@@ -1,10 +1,11 @@
 const controller = {};
 const { Nota, Usuario, Checklist } = require("../bd");
 
-controller.getNota = async (id, transaction = null) => {
+controller.getNota = async (id, usuarioId, transaction = null) => {
   const result = await Nota.findOne({
     where: {
       id,
+      usuarioId,
     },
     include: [
       {
@@ -22,8 +23,11 @@ controller.getNota = async (id, transaction = null) => {
   return result;
 };
 
-controller.getNotas = async () => {
+controller.getNotas = async (usuarioId) => {
   return await Nota.findAll({
+    where: {
+      usuarioId,
+    },
     include: [
       {
         model: Usuario,
