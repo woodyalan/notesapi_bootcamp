@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
   const { titulo, descricao, checklists } = req.body;
 
   try {
-    const nota = await createNota(usuarioId, titulo, descricao, checklists);
+    const nota = await createNota(usuarioId, titulo, descricao, checklist);
 
     res.send(nota);
   } catch (erro) {
