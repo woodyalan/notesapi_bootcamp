@@ -27,4 +27,8 @@ controller.getUsuarioByEmail = async (email) => {
   });
 };
 
+controller.getUsuarioById = async (id) => {
+  return await Usuario.findByPk(id);
+};
+
 module.exports = controller;
