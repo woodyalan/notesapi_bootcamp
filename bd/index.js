@@ -4,12 +4,15 @@ const inicializarNota = require("./Nota");
 const inicializarChecklist = require("./Checklist");
 let bd = {};
 
+const ambiente = process.env.NODE_ENV;
+
 const options = {
   username: "admin",
   password: "notes123",
   database: "notes",
   dialect: "mysql",
   host: "notes.cgssmrnlwpdu.us-east-2.rds.amazonaws.com",
+  logging: ambiente == "development" ? true : false,
 };
 
 const sequelize = new Sequelize(options);

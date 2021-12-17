@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+const morgan = require("morgan");
 const app = express();
 const porta = 3000;
 
+app.use(morgan("dev"));
 app.use(cors({ origin: "http://grupointegrado.br" }));
 app.use(express.json());
 
