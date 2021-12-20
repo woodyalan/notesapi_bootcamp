@@ -1,20 +1,30 @@
 const jwt = require("jsonwebtoken");
+const { check, validationResult } = require("express-validator");
 const { palavraChave } = require("../config/token");
 
-module.exports = (req, res, next) => {
-  const token = req.headers.authorization;
+module.exports = [
+  check("authorization").isJWT().withMessage("Token deve estar no formato JWT"),
+  (req, res, next) => {
+    const erros = validationResult(req);
 
-  if (!token) {
-    res.status(401).send({ mensagem: "Informe um token" });
-  }
-
-  jwt.verify(token, palavraChave, (erro, decoded) => {
-    if (erro) {
-      res.status(500).send({ mensagem: "Falha ao verificar token" });
+    if (!erros.isEmpty()) {
+      return res.status(400).send(erros);
     }
 
-    req.usuarioId = decoded.id;
+    const token = req.headers.authorization;
 
-    next();
-  });
-};
+    if (!token) {
+      res.status(401).send({ mensagem: "Informe um token" });
+    }
+
+    jwt.verify(token, palavraChave, (erro, decoded) => {
+      if (erro) {
+        res.status(500).send({ mensagem: "Falha ao verificar token" });
+      }
+
+      req.usuarioId = decoded.id;
+
+      next();
+    });
+  },
+];

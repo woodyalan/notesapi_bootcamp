@@ -1,33 +1,61 @@
 const { Router } = require("express");
+const { body, check, validationResult } = require("express-validator");
 const { Nota, Checklist, sequelize } = require("../bd");
 const { getNota, getNotas, createNota } = require("../controle/nota");
 const router = Router();
 
-router.get("/:id?", async (req, res) => {
-  const usuarioId = req.usuarioId;
-  const { id } = req.params;
+router.get(
+  "/:id?",
+  check("id")
+    .optional()
+    .isInt()
+    .withMessage("ID precisa ser um número inteiro"),
+  async (req, res) => {
+    const erros = validationResult(req);
 
-  let resultado = id ? await getNota(id, usuarioId) : await getNotas(usuarioId);
+    if (!erros.isEmpty()) {
+      return res.status(400).send(erros);
+    }
 
-  res.send(resultado);
-});
+    const usuarioId = req.usuarioId;
+    const { id } = req.params;
 
-router.post("/", async (req, res) => {
-  const usuarioId = req.usuarioId;
-  const { titulo, descricao, checklists } = req.body;
+    let resultado = id
+      ? await getNota(id, usuarioId)
+      : await getNotas(usuarioId);
 
-  try {
-    const nota = await createNota(usuarioId, titulo, descricao, checklist);
-
-    res.send(nota);
-  } catch (erro) {
-    console.log(erro);
-
-    res.status(500).send({
-      erro,
-    });
+    res.send(resultado);
   }
-});
+);
+
+router.post(
+  "/",
+  body("checklists")
+    .isArray()
+    .withMessage("Checklists deve ser um array de objetos"),
+  async (req, res) => {
+    const erros = validationResult(req);
+
+    if (!erros.isEmpty()) {
+      return res.status(400).send(erros);
+    }
+
+    const usuarioId = req.usuarioId;
+    const { titulo, descricao, checklists } = req.body;
+
+    try {
+      const nota = await createNota(usuarioId, titulo, descricao, checklists);
+
+      res.send(nota);
+    } catch (erro) {
+      console.log(erro);
+
+      res.status(500).send({
+        erro,
+      });
+    }
+  }
+);
 
 router.put("/:id", async (req, res) => {
   const transacao = await sequelize.transaction();
